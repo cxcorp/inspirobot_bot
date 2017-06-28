@@ -2,19 +2,30 @@
 const TgClient = require('node-telegram-bot-api')
 const fs = require('fs')
 const fetch = require('node-fetch')
-const express = require('express');
 require('dotenv').config()
 
 const TG_API_TOKEN = process.env.TG_API_TOKEN
 const INSPIRO_API_URL = process.env.INSPIRO_API_URL
+const WEBHOOK_PORT = parseInt(process.env.PORT || '1234', 10)
 
-/* don't have an SSL cert for webhook, use polling instead */
-const client = new TgClient(TG_API_TOKEN, { polling: true })
+const client = createClient()
 client.onText(/\/inspireme/, inspireCommand)
 
-if (process.env.HEROKU) {
-    // heroku kills web dynos after 60s if they don't bind to PORT
-    redirectIndexToBot()
+
+function createClient() {
+    if (process.env.HEROKU_APP_NAME) {
+        const client = new TgClient(TG_API_TOKEN, {
+            webHook: {
+                port: WEBHOOK_PORT
+            }
+        })
+        client.setWebHook(`https://${process.env.HEROKU_APP_NAME}.herokuapp.com/bot${TG_API_TOKEN}`)
+        return client
+    } else {
+        return new TgClient(TG_API_TOKEN, {
+            polling: true
+        })
+    }
 }
 
 function inspireCommand(msg) {
@@ -36,13 +47,5 @@ function inspireCommand(msg) {
 }
 
 function getUserAgent() {
-    return 'Inspiro Telegram Bot v0.2.2 (github.com/cxcorp/inspirobot_bot)'
-}
-
-function redirectIndexToBot() {
-    const convoUrl = process.env.BOT_CONVO_URL || 'https://telegram.me/inspirobot_bot'
-    const port = parseInt(process.env.PORT || '1234', 10)
-    const app = express()
-    app.get('*', (req, res) => res.redirect(convoUrl))
-    app.listen(port)
+    return 'Inspiro Telegram Bot v0.3.0 (github.com/cxcorp/inspirobot_bot)'
 }

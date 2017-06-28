@@ -36,7 +36,7 @@ function inspireCommand(msg) {
 }
 
 function getUserAgent() {
-    return 'Inspiro Telegram Bot v0.2.1 (github.com/cxcorp/inspirobot_bot)'
+    return 'Inspiro Telegram Bot v0.2.2 (github.com/cxcorp/inspirobot_bot)'
 }
 
 function redirectIndexToBot() {

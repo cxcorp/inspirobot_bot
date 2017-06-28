@@ -43,6 +43,6 @@ function redirectIndexToBot() {
     const convoUrl = process.env.BOT_CONVO_URL || 'https://telegram.me/inspirobot_bot'
     const port = parseInt(process.env.PORT || '1234', 10)
     const app = express()
-    app.get('/', (req, res) => res.redirect(convoUrl))
+    app.get('*', (req, res) => res.redirect(convoUrl))
     app.listen(port)
 }
